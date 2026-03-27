@@ -1,0 +1,79 @@
+================================================================================
+               GUIA RÁPIDO: DEPLOY + MOBILE
+================================================================================
+
+
+DEPLOY NA RENDER (5 MINUTOS)
+============================
+
+1. Push no GitHub
+2. Criar Postgres na Render (copiar connection string)
+3. Criar Web Service backend: .NET
+4. Criar Static Site frontend: React
+5. Criar Redis
+6. Conectar tudo
+
+URLS FINAIS:
+- Frontend: https://seu-app.onrender.com
+- API: https://seu-api.onrender.com/swagger
+
+
+ACESSAR NO CELULAR (3 OPÇÕES)
+==============================
+
+RÁPIDO (WIFI LOCAL)
+- http://192.168.1.100:3000
+(Troque IP pelo seu PC)
+
+DE QUALQUER LUGAR (NGROK)
+- .\ngrok.exe http 3000
+- Copie a URL que aparecer
+
+PRODUÇÃO (RENDER)
+- https://seu-app.onrender.com
+
+
+COMANDOS IMPORTANTES
+====================
+
+Descobrir IP PC:
+   ipconfig
+
+Testar Portas:
+   netstat -ano | findstr :3000
+   netstat -ano | findstr :5000
+
+Iniciar Ngrok:
+   cd C:\ngrok
+   .\ngrok.exe http 3000
+
+Start Backend:
+   cd C:\Users\Administrator\Desktop\CL-TECH-CORE\saas\backend\src\ClTechCore.Api
+   dotnet run
+
+Start Frontend:
+   cd C:\Users\Administrator\Desktop\CL-TECH-CORE\saas\frontend
+   npm run dev
+
+
+CHECKLIST DEPLOY
+================
+
+[ ] Repositório no GitHub
+[ ] Conta Render criada
+[ ] PostgreSQL criado na Render
+[ ] Backend deployado
+[ ] Frontend deployado
+[ ] Redis criado
+[ ] Environment vars atualizadas
+[ ] Teste no navegador funciona
+[ ] Teste no celular funciona
+
+
+LEIA OS ARQUIVOS COMPLETOS
+===========================
+
+- DEPLOY_RENDER.txt - Instruções detalhadas
+- ACESSO_MOBILE.txt - Todas as opções de mobile
+
+================================================================================

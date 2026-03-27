@@ -1,0 +1,184 @@
+================================================================================
+              ACESSAR APP EM CELULARES (LOCAL E PRODUÇÃO)
+================================================================================
+
+OPÇÃO 1: VIA WIFI DO MESMO PC (LOCAL)
+======================================
+
+ANDROID E IPHONE
+================
+
+1. DESCOBRIR IP DO PC:
+   - Abra PowerShell como admin
+   - Execute: ipconfig
+   - Procure por "IPv4 Address" (Ex: 192.168.1.100)
+   - Copie o valor (NÃO use 127.0.0.1 ou localhost)
+
+2. NO CELULAR (ANDROID/IPHONE):
+   - Conecte à mesma rede WiFi do PC
+   - Abra navegador (Chrome, Safari, etc)
+   - Acesse: http://SEU_IP:3000
+   - Exemplo: http://192.168.1.100:3000
+
+3. TESTAR API:
+   - Acesse: http://SEU_IP:5000/swagger
+
+TROUBLESHOOTING LOCAL
+=====================
+
+Celular não encontra IP:
+- Desative firewall do Windows (Win+R → firewall.cpl)
+- Ou libere portas 3000 e 5000 no firewall
+
+Conexão recusada:
+- Verifique se frontend/backend estão rodando
+- Confirme IP com ipconfig novamente
+
+
+OPÇÃO 2: VIA NGROK (ACESSAR DE QUALQUER LUGAR)
+===============================================
+
+INSTALAÇÃO NGROK
+================
+
+1. Baixe em: https://ngrok.com/download
+2. Descompacte em: C:\ngrok
+3. Execute no PowerShell:
+
+   cd C:\ngrok
+   .\ngrok.exe http 3000
+
+4. COPIE A URL GERADA (ex: https://abc123.ngrok.io)
+5. Acesse no celular: https://abc123.ngrok.io
+
+PARA API:
+
+   .\ngrok.exe http 5000
+
+VANTAGEM: Funciona de qualquer lugar do mundo, não precisa mesma rede
+
+
+OPÇÃO 3: DEPLOY JÁ PUBLICADO (RENDER/CLOUD)
+============================================
+
+ACESSO SIMPLES
+==============
+
+1. Abra o navegador do celular
+2. Digite a URL do Deploy:
+   - Frontend: https://cltech-frontend.onrender.com
+   - API: https://cltech-api.onrender.com/swagger
+3. Pronto! Funciona em qualquer rede
+
+
+PASSO A PASSO COMPLETO: ACESSAR NO CELULAR (WIFI LOCAL)
+========================================================
+
+1. INICIAR BACKEND E FRONTEND
+
+Terminal 1 - Backend:
+   cd "C:\Users\Administrator\Desktop\CL-TECH-CORE\saas\backend\src\ClTechCore.Api"
+   dotnet run
+
+Terminal 2 - Frontend:
+   cd "C:\Users\Administrator\Desktop\CL-TECH-CORE\saas\frontend"
+   npm run dev
+
+
+2. DESCOBRIR IP DO PC
+
+   ipconfig
+
+Procure pela linha:
+   IPv4 Address . . . . . . . . . . . : 192.168.1.100
+
+
+3. IR AO CELULAR
+
+IPHONE:
+   1. Abra Safari
+   2. Digite: http://192.168.1.100:3000
+   3. Pressione "Go"
+
+ANDROID:
+   1. Abra Chrome
+   2. Digite: http://192.168.1.100:3000
+   3. Pressione "Enter"
+
+
+4. TESTAR FUNCIONAMENTO
+
+- Página deve carregar com o logo e menu
+- Tente fazer login
+- Se funcionar no celular, está tudo certo!
+
+
+OPÇÃO MOBILE ESPECÍFICA: REACT NATIVE (APLICATIVO)
+===================================================
+
+Se quiser um APP de verdade no celular (sem navegador):
+
+   cd "C:\Users\Administrator\Desktop\CL-TECH-CORE\saas\mobile"
+   npm install
+   npm start
+
+Scan o QR code com Expo Go app:
+   - iOS: https://apps.apple.com/app/expo-go/id982107779
+   - Android: https://play.google.com/store/apps/details?id=host.exp.exponent
+
+
+TABELA DE ACESSO
+================
+
+LOCAL/REDE          URL                           DISPOSITIVO    COMO
+Mesmo WiFi          http://192.168.1.100:3000    Qualquer       IP + Porta
+De qualquer lugar   https://abc123.ngrok.io      Qualquer       Ngrok
+Produção            https://cltech-frontend.onrender.com   Qualquer   Direto pela web
+APP Nativo          Expo Go                       Android/iOS    React Native
+
+
+RESOLUÇÃO DE PROBLEMAS
+======================
+
+"NÃO CONSIGO ACESSAR DE FORMA ALGUMA"
+
+1. Verifique se backend/frontend estão rodando:
+
+   netstat -ano | findstr :3000
+   netstat -ano | findstr :5000
+
+2. Se não aparecer nada, start os serviços novamente
+
+3. Desative o firewall temporariamente para testar:
+   - Win+R → firewall.cpl
+   - Clique "Turn Windows Firewall on or off"
+   - "Off" (apenas teste)
+
+
+"CONECTA MAS A PÁGINA NÃO CARREGA"
+
+- Limpe cache do navegador do celular (Ctrl+Shift+Del)
+- Ou abra em modo privado/incógnito
+- Verifique IP novamente
+
+
+"API MOSTRA ERRO 401/403"
+
+- Backend pode estar com CORS desabilitado
+- Adicione no Program.cs:
+
+app.UseCors(builder => builder
+    .AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader());
+
+
+MELHOR OPÇÃO RECOMENDADA
+========================
+
+Para Testes: WiFi Local (Opção 1)
+Para Demonstrar: Ngrok (Opção 2)
+Para Produção: Render Deploy (Opção 3)
+Para APP Nativo: React Native + Expo (Opção 4)
+
+================================================================================

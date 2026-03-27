@@ -1,0 +1,91 @@
+import React, { useState } from 'react'
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
+import { useAuthStore } from '../store/authStore'
+
+export default function Login() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
+  const setAuth = useAuthStore(state => state.setAuth)
+
+  const handleLogin = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/v1/auth/login`,
+        { email, password }
+      )
+
+      const { data } = response.data
+      setAuth(data.user, data.accessToken, data.refreshToken)
+      navigate('/dashboard')
+    } catch (err) {
+      setError(err.response?.data?.message || 'Erro ao fazer login')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4">
+      <div className="card max-w-md w-full">
+        <h1 className="text-3xl font-bold text-neon-green mb-8">CL-TECH-CORE</h1>
+        
+        {error && (
+          <div className="mb-4 p-3 bg-red-500 bg-opacity-20 text-red-400 rounded-lg">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-neon-green mb-2">
+              Email
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="input"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-neon-green mb-2">
+              Senha
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="input"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full btn btn-primary"
+            disabled={loading}
+          >
+            {loading ? 'Entrando...' : 'Entrar'}
+          </button>
+        </form>
+
+        <p className="text-center text-gray-400 mt-4">
+          Não tem conta?{' '}
+          <a href="/register" className="text-neon-green hover:underline">
+            Criar conta
+          </a>
+        </p>
+      </div>
+    </div>
+  )
+}

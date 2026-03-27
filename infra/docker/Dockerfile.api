@@ -1,0 +1,39 @@
+# Build Stage
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Copy project files
+COPY ["backend/src/ClTechCore.Api/ClTechCore.Api.csproj", "ClTechCore.Api/"]
+COPY ["backend/src/ClTechCore.Application/ClTechCore.Application.csproj", "ClTechCore.Application/"]
+COPY ["backend/src/ClTechCore.Domain/ClTechCore.Domain.csproj", "ClTechCore.Domain/"]
+COPY ["backend/src/ClTechCore.Infrastructure/ClTechCore.Infrastructure.csproj", "ClTechCore.Infrastructure/"]
+
+# Restore dependencies
+WORKDIR "/src/ClTechCore.Api"
+RUN dotnet restore "ClTechCore.Api.csproj"
+
+# Copy source code
+COPY backend/src/ .
+
+# Build the project
+ARG CONFIGURATION=Release
+RUN dotnet build "ClTechCore.Api/ClTechCore.Api.csproj" -c $CONFIGURATION -o /app/build
+
+# Publish Stage
+FROM build AS publish
+ARG CONFIGURATION=Release
+RUN dotnet publish "ClTechCore.Api/ClTechCore.Api.csproj" -c $CONFIGURATION -o /app/publish
+
+# Runtime Stage
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+
+# Install curl for health checks
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+COPY --from=publish /app/publish .
+
+EXPOSE 5000
+ENV ASPNETCORE_URLS=http://+:5000
+
+ENTRYPOINT ["dotnet", "ClTechCore.Api.dll"]

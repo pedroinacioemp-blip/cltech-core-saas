@@ -1,0 +1,144 @@
+version: '3.9'
+
+services:
+  # ============================================================================
+  # SQL SERVER DATABASE
+  # ============================================================================
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: cltech-sqlserver
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: YourStrongPassword123!
+      MSSQL_PID: Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - cltech-network
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P YourStrongPassword123! -Q 'SELECT 1'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================================================
+  # REDIS CACHE
+  # ============================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: cltech-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - cltech-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================================================
+  # .NET 8 API
+  # ============================================================================
+  api:
+    build:
+      context: .
+      dockerfile: ./infra/docker/Dockerfile.api
+      args:
+        CONFIGURATION: Release
+    container_name: cltech-api
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:5000
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=ClTechCoreDB;User Id=sa;Password=YourStrongPassword123!;"
+      Redis__ContainerName: "redis:6379"
+      Jwt__SecretKey: "your-super-secret-key-change-in-production-at-least-32-characters-long"
+      Jwt__Issuer: "cltech-api"
+      Jwt__Audience: "cltech-app"
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app
+    networks:
+      - cltech-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ============================================================================
+  # FRONTEND REACT (NGINX)
+  # ============================================================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_URL: http://localhost:5000
+    container_name: cltech-frontend
+    depends_on:
+      - api
+    ports:
+      - "3000:80"
+    environment:
+      REACT_APP_API_URL: http://api:5000
+    networks:
+      - cltech-network
+
+  # ============================================================================
+  # PHPMYADMIN (Optional - Database Management)
+  # ============================================================================
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: cltech-phpmyadmin
+    depends_on:
+      - sqlserver
+    environment:
+      PMA_HOST: sqlserver
+      PMA_USER: sa
+      PMA_PASSWORD: YourStrongPassword123!
+      PMA_PORT: 1433
+    ports:
+      - "8081:80"
+    networks:
+      - cltech-network
+    profiles:
+      - dev
+
+  # ============================================================================
+  # REDIS COMMANDER (Optional - Redis Management)
+  # ============================================================================
+  redis-commander:
+    image: leonarduschen/redis-commander:latest
+    container_name: cltech-redis-commander
+    depends_on:
+      - redis
+    environment:
+      REDIS_HOSTS: default:redis:6379
+    ports:
+      - "8082:8081"
+    networks:
+      - cltech-network
+    profiles:
+      - dev
+
+networks:
+  cltech-network:
+    driver: bridge
+
+volumes:
+  sqlserver_data:
+  redis_data:

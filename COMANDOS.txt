@@ -1,0 +1,35 @@
+# COMANDOS PARA INICIAR CL-TECH-CORE SAAS (NATIVO)
+
+# 1) Entrar na pasta do projeto
+cd "C:\Users\Administrator\Desktop\CL-TECH-CORE\saas"
+
+# 2) (Opcional) rodar script de startup que inicia backend+frontend+bot
+.\START-NATIVE.ps1
+
+# 3) Backend (API .NET)
+cd "C:\Users\Administrator\Desktop\CL-TECH-CORE\saas\backend\src\ClTechCore.Api"
+dotnet restore
+dotnet run
+
+# 4) Frontend (React)
+cd "C:\Users\Administrator\Desktop\CL-TECH-CORE\saas\frontend"
+npm install
+npm run dev
+
+# 5) Bot (WhatsApp)
+cd "C:\Users\Administrator\Desktop\CL-TECH-CORE\saas\bot"
+npm install
+node src/index.js
+
+# 6) Verificar serviços (SQL Server e Redis)
+Get-Service MSSQLSERVER
+Get-Service Redis
+
+# 7) Testar conexão SQL Server (sqlcmd)
+# Ajuste o caminho do sqlcmd conforme sua instalação
+"C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\sqlcmd.exe" -S localhost -U sa -P YourStrongPassword123! -Q "SELECT @@VERSION"
+
+# 8) Acessar no navegador
+http://localhost:3000
+http://localhost:5000/swagger
+http://localhost:5000/hangfire
