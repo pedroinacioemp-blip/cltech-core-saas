@@ -1,0 +1,125 @@
+═══════════════════════════════════════════════════════════════════════════════
+  DEPLOYMENT CHECKLIST - Node.js Express API on Render
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ COMPLETED:
+  ✓ /api folder structure created with production-ready files
+  ✓ package.json with all dependencies
+  ✓ server.js with Express, CORS, middleware
+  ✓ Database config (PostgreSQL + SSL)
+  ✓ JWT authentication system
+  ✓ Auth routes (register/login with bcrypt)
+  ✓ Protected user CRUD routes
+  ✓ Database schema setup script
+  ✓ Environment configuration template (.env.example)
+  ✓ .gitignore for Node.js
+  ✓ Code pushed to GitHub
+
+🚀 NEXT STEPS - RENDER DEPLOYMENT:
+
+STEP 1: Create PostgreSQL Database on Render
+  1. Go to https://dashboard.render.com
+  2. Click "New" → "PostgreSQL"
+  3. Database Name: cltech_core_db
+  4. User: postgres
+  5. Region: Choose closest (São Paulo if available)
+  6. Plan: Free (spinning down after 15 mins)
+  7. Create database
+  8. COPY the "External Database URL" (looks like: postgres://user:password@host:5432/db)
+
+STEP 2: Create Web Service for Backend
+  1. Go https://dashboard.render.com
+  2. Click "New" → "Web Service"
+  3. Connect GitHub repo: cltech-core-saas
+  4. Configuration:
+     - Name: cltech-api
+     - Environment: Node
+     - Build Command: cd api && npm install
+     - Start Command: cd api && npm start
+     - Plan: Free
+  5. ENVIRONMENT VARIABLES:
+     DATABASE_URL=postgres://user:password@host:5432/db [PASTE from Step 1]
+     JWT_SECRET=your-secret-key-change-this-in-production
+     PORT=5000
+     HOST=0.0.0.0
+     NODE_ENV=production
+     REDIS_URL=redis://optional-redis-url (optional)
+     API_URL=https://cltech-api.onrender.com
+     FRONTEND_URL=https://your-frontend-domain.com
+  6. Deploy
+
+STEP 3: Initialize PostgreSQL Database
+  1. Get connection string from Render PostgreSQL
+  2. Use pgAdmin or command line:
+     psql "postgres://user:password@host:5432/db" < api/database_setup.sql
+  3. Verify tables created:
+     SELECT * FROM users;
+
+STEP 4: Update Frontend Configuration
+  1. Open frontend/.env.production
+  2. Update VITE_API_URL to: https://cltech-api.onrender.com
+  3. Redeploy frontend on Render
+
+STEP 5: Test API Endpoints
+  Test using curl or Postman:
+  
+  Register:
+    POST https://cltech-api.onrender.com/api/auth/register
+    Body: { "name": "Test User", "email": "test@example.com", "password": "pass123" }
+  
+  Login:
+    POST https://cltech-api.onrender.com/api/auth/login
+    Body: { "email": "test@example.com", "password": "pass123" }
+  
+  Get Users (requires token):
+    GET https://cltech-api.onrender.com/api/users
+    Header: Authorization: Bearer {token_from_login}
+
+STEP 6: Verify Health Check
+  GET https://cltech-api.onrender.com/health
+  Should return: { "status": "ok", "timestamp": "..." }
+
+═══════════════════════════════════════════════════════════════════════════════
+  TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════════════════════
+
+Issue: Port already in use
+  Solution: Render automatically assigns PORT from environment variable
+
+Issue: Database connection fails
+  Solution: Verify DATABASE_URL starts with "postgres://"
+  Check SSL setting in /api/src/config/database.js
+
+Issue: CORS errors on frontend
+  Solution: Add frontend URL to FRONTEND_URL env var in server.js CORS config
+
+Issue: JWT authentication fails
+  Solution: Check JWT_SECRET is set in Render environment vars
+  Verify Authorization header format: "Bearer {token}"
+
+═══════════════════════════════════════════════════════════════════════════════
+  PRODUCTION IMPROVEMENTS (Optional)
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Add input validation with Joi schemas
+2. Implement comprehensive error logging
+3. Add rate limiting middleware
+4. Set up monitoring and alerts
+5. Add Redis caching for sessions
+6. Implement email verification for registration
+7. Add password reset functionality
+8. Set up automated backups for PostgreSQL
+9. Configure custom domain with SSL
+10. Implement API versioning (/api/v1/...)
+
+═══════════════════════════════════════════════════════════════════════════════
+  USEFUL LINKS
+═══════════════════════════════════════════════════════════════════════════════
+
+Render Dashboard: https://dashboard.render.com
+API Code: /api folder (Node.js Express)
+GitHub Repo: https://github.com/pedroinacioemp-blip/cltech-core-saas
+Database Setup: /api/database_setup.sql
+Environment Example: /api/.env.example
+
+═══════════════════════════════════════════════════════════════════════════════
