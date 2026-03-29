@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
+import { toast } from 'react-hot-toast'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -18,15 +19,18 @@ export default function Login() {
 
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/v1/auth/login`,
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/login`,
         { email, password }
       )
 
-      const { data } = response.data
-      setAuth(data.user, data.accessToken, data.refreshToken)
+      const { user, accessToken } = response.data
+      setAuth(user, accessToken)
+      toast.success('Bem-vindo de volta!')
       navigate('/dashboard')
     } catch (err) {
-      setError(err.response?.data?.message || 'Erro ao fazer login')
+      const msg = err.response?.data?.error || 'Erro ao fazer login'
+      setError(msg)
+      toast.error(msg)
     } finally {
       setLoading(false)
     }

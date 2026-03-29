@@ -8,19 +8,26 @@
     "dev": "nodemon server.js",
     "test": "jest"
   },
-  "keywords": ["api", "express", "node"],
+  "keywords": [
+    "api",
+    "express",
+    "node"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "body-parser": "^1.20.2",
-    "pg": "^8.11.3",
+    "express-rate-limit": "^8.3.1",
+    "joi": "^17.11.0",
     "jsonwebtoken": "^9.0.2",
-    "bcryptjs": "^2.4.3",
+    "pg": "^8.11.3",
     "redis": "^4.6.12",
-    "joi": "^17.11.0"
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"

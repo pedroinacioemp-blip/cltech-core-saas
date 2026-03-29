@@ -3,11 +3,47 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: { error: 'Too many requests, please try again later.' }
+});
+
+// Apply limiter to all requests
+app.use(limiter);
+
+// Swagger configuration
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'CL-TECH CORE API',
+      version: '1.0.0',
+      description: 'API para gerenciamento de mídias e automação SaaS',
+    },
+    servers: [
+      {
+        url: process.env.NODE_ENV === 'production' 
+          ? 'https://cltech-api.onrender.com' 
+          : `http://localhost:${process.env.PORT || 5000}`,
+      },
+    ],
+  },
+  apis: ['./src/routes/*.js'], // Path to the API docs
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Middleware
 app.use(cors());
@@ -38,10 +74,12 @@ app.get('/api', (req, res) => {
 const authRoutes = require('./src/routes/auth');
 const userRoutes = require('./src/routes/users');
 const imageRoutes = require('./src/routes/images');
+const webhookRoutes = require('./src/routes/webhooks');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/images', imageRoutes);
+app.use('/api/webhooks', webhookRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

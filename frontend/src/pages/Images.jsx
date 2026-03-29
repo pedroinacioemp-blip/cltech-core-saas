@@ -3,7 +3,10 @@ import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 import Sidebar from '../components/Sidebar';
 import Card from '../components/Card';
-import { Upload, Image as ImageIcon, Send, Loader2 } from 'lucide-react';
+import Skeleton from '../components/Skeleton';
+import { Upload, Image as ImageIcon, Send, Loader2, Copy, Check, Trash2, Edit3, Save, X } from 'lucide-react';
+import { toast } from 'react-hot-toast';
+import imageCompression from 'browser-image-compression';
 
 export default function ImageGallery() {
   const [images, setImages] = useState([]);
@@ -12,6 +15,9 @@ export default function ImageGallery() {
   const [caption, setCaption] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [copiedId, setCopiedId] = useState(null);
+  const [editingId, setEditingId] = useState(null);
+  const [editCaption, setEditCaption] = useState('');
   const { accessToken } = useAuthStore();
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -19,6 +25,13 @@ export default function ImageGallery() {
   useEffect(() => {
     fetchImages();
   }, []);
+
+  const copyToClipboard = (text, id) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    toast.success('Link copiado!');
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   const fetchImages = async () => {
     try {
@@ -30,6 +43,33 @@ export default function ImageGallery() {
       console.error('Erro ao buscar imagens:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleUpdateCaption = async (id) => {
+    try {
+      await axios.patch(`${API_URL}/api/images/${id}`, { caption: editCaption }, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+      toast.success('Legenda atualizada!');
+      setEditingId(null);
+      fetchImages();
+    } catch (err) {
+      toast.error('Erro ao atualizar legenda');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Deseja excluir esta imagem permanentemente?')) return;
+    
+    try {
+      await axios.delete(`${API_URL}/api/images/${id}`, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+      toast.success('Imagem excluída!');
+      fetchImages();
+    } catch (err) {
+      toast.error('Erro ao excluir imagem');
     }
   };
 
@@ -48,24 +88,37 @@ export default function ImageGallery() {
     if (!selectedFile) return;
 
     setUploading(true);
-    const formData = new FormData();
-    formData.append('image', selectedFile);
-    formData.append('caption', caption);
-
+    const toastId = toast.loading('Otimizando e enviando imagem...');
+    
     try {
+      // Compress image before upload
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true
+      };
+      
+      const compressedFile = await imageCompression(selectedFile, options);
+      
+      const formData = new FormData();
+      formData.append('image', compressedFile);
+      formData.append('caption', caption);
+
       await axios.post(`${API_URL}/api/images/upload`, formData, {
         headers: { 
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'multipart/form-data'
         }
       });
+      
+      toast.success('Imagem salva com sucesso!', { id: toastId });
       setCaption('');
       setSelectedFile(null);
       setPreview(null);
       fetchImages();
     } catch (err) {
       console.error('Erro no upload:', err);
-      alert('Erro ao enviar imagem');
+      toast.error('Erro ao enviar imagem', { id: toastId });
     } finally {
       setUploading(false);
     }
@@ -130,18 +183,56 @@ export default function ImageGallery() {
           {/* Gallery Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {loading ? (
-              [1,2,3].map(i => <div key={i} className="h-64 bg-gray-900 rounded-xl animate-pulse" />)
+              [1,2,3,4,5,6].map(i => <Skeleton key={i} className="h-72" />)
             ) : images.length > 0 ? (
               images.map((img) => (
                 <div key={img.id} className="group relative bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-green-500/50 transition-all">
-                  <div className="h-48 overflow-hidden">
+                  <div className="h-48 overflow-hidden relative">
                     <img src={img.url} alt={img.caption} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <button 
+                      onClick={() => handleDelete(img.id)}
+                      className="absolute top-2 right-2 p-2 bg-red-500/80 hover:bg-red-500 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                   <div className="p-4">
-                    <p className="text-sm text-gray-300 line-clamp-2 italic">"{img.caption || 'Sem legenda'}"</p>
+                    {editingId === img.id ? (
+                      <div className="space-y-2">
+                        <textarea
+                          value={editCaption}
+                          onChange={(e) => setEditCaption(e.target.value)}
+                          className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-sm text-gray-300 focus:ring-1 focus:ring-green-500 outline-none"
+                        />
+                        <div className="flex gap-2">
+                          <button onClick={() => handleUpdateCaption(img.id)} className="p-1 text-green-400 hover:bg-gray-800 rounded"><Save className="w-4 h-4" /></button>
+                          <button onClick={() => setEditingId(null)} className="p-1 text-red-400 hover:bg-gray-800 rounded"><X className="w-4 h-4" /></button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between items-start gap-2">
+                        <p className="text-sm text-gray-300 line-clamp-2 italic">"{img.caption || 'Sem legenda'}"</p>
+                        <button 
+                          onClick={() => { setEditingId(img.id); setEditCaption(img.caption || ''); }}
+                          className="p-1 text-gray-500 hover:text-green-400"
+                        >
+                          <Edit3 className="w-3 h-3" />
+                        </button>
+                      </div>
+                    )}
+                    
                     <div className="mt-4 flex items-center justify-between">
                       <span className="text-xs text-gray-500">{new Date(img.created_at).toLocaleDateString()}</span>
-                      <button className="text-xs text-green-400 hover:underline">Copiar Link API</button>
+                      <button 
+                        onClick={() => copyToClipboard(img.url, img.id)}
+                        className="flex items-center gap-1 text-xs text-green-400 hover:text-green-300 transition-colors"
+                      >
+                        {copiedId === img.id ? (
+                          <><Check className="w-3 h-3" /> Copiado</>
+                        ) : (
+                          <><Copy className="w-3 h-3" /> Copiar Link</>
+                        )}
+                      </button>
                     </div>
                   </div>
                 </div>

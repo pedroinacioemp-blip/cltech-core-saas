@@ -3,11 +3,27 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const pool = require('../config/database');
 const { generateToken } = require('../config/jwt');
+const Joi = require('joi');
+
+// Validation schemas
+const loginSchema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().min(6).required()
+});
+
+const registerSchema = Joi.object({
+  name: Joi.string().min(2).required(),
+  email: Joi.string().email().required(),
+  password: Joi.string().min(6).required()
+});
 
 // Register
 router.post('/register', async (req, res) => {
   try {
-    const { email, password, name } = req.body;
+    const { error } = registerSchema.validate(req.body);
+    if (error) return res.status(400).json({ error: error.details[0].message });
+
+    const { name, email, password } = req.body;
 
     if (!email || !password || !name) {
       return res.status(400).json({ error: 'Missing required fields' });
@@ -36,6 +52,9 @@ router.post('/register', async (req, res) => {
 // Login
 router.post('/login', async (req, res) => {
   try {
+    const { error } = loginSchema.validate(req.body);
+    if (error) return res.status(400).json({ error: error.details[0].message });
+
     const { email, password } = req.body;
 
     if (!email || !password) {

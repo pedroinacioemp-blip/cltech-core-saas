@@ -59,4 +59,50 @@ router.get('/', authMiddleware, async (req, res) => {
   }
 });
 
+// Update Image Caption
+router.patch('/:id', authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { caption } = req.body;
+
+    const result = await pool.query(
+      'UPDATE images SET caption = $1, updated_at = NOW() WHERE id = $2 AND user_id = $3 RETURNING *',
+      [caption, id, req.userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Image not found or unauthorized' });
+    }
+
+    res.json({ message: 'Caption updated successfully', image: result.rows[0] });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update caption' });
+  }
+});
+
+// Delete Image
+router.delete('/:id', authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query(
+      'DELETE FROM images WHERE id = $1 AND user_id = $2 RETURNING public_id',
+      [id, req.userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Image not found or unauthorized' });
+    }
+
+    // Delete from Cloudinary as well
+    if (result.rows[0].public_id) {
+      await cloudinary.uploader.destroy(result.rows[0].public_id);
+    }
+
+    res.json({ message: 'Image deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete image' });
+  }
+});
+
 module.exports = router;
