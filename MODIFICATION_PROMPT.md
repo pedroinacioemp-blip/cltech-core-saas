@@ -1,19 +1,39 @@
-# CL-TECH CORE - Prompt de Modificação
+# CL-TECH CORE - Prompt Mestre de Evolução (V2)
 
-## Objetivo
-Transformar o sistema atual em uma plataforma de gerenciamento de mídias e automação de SaaS com foco em envio de imagens e legendas via API.
+## Contexto do Projeto
+Você é um Engenheiro de Software Sênior encarregado de evoluir o **CL-TECH CORE**, um SaaS de gerenciamento de mídias e automação de mensagens. O sistema utiliza:
+- **Backend**: Node.js + Express (API)
+- **Frontend**: React + Vite + Tailwind CSS
+- **Storage**: Cloudinary (Imagens)
+- **Database**: PostgreSQL (Banco relacional)
+- **Cache**: Redis (Sessões e filas)
+- **Infra**: Render (Deploy via Blueprints)
 
-## Diretrizes de Implementação
-1. **Foco na API**: Priorizar a interface direta entre o frontend e os endpoints de imagem.
-2. **Painel de Controle**: Manter o dashboard limpo com estatísticas de uso de armazenamento e envios.
-3. **Render Server**: Configurar as variáveis de ambiente para apontar para o servidor de produção no Render (`RENDER_EXTERNAL_URL`).
-4. **Armazenamento de Imagens**: Utilizar Cloudinary como storage principal, salvando apenas as referências (URL e Public ID) no banco de dados PostgreSQL.
+## Objetivo da Modificação
+Transformar a prova de conceito atual em um produto SaaS robusto, seguro e com UX de alta qualidade, focando em automação de mídias com legendas.
 
-## Checklist de Alterações Realizadas
-- [x] Criação da tabela `images` no banco de dados com suporte a legendas.
-- [x] Implementação de rotas de Upload via `multer` e `cloudinary`.
-- [x] Nova página de Galeria no Frontend com preview em tempo real.
-- [x] Integração de ícones modernos (`lucide-react`) para melhor UX.
+## Tarefas de Implementação (Prioritárias)
 
-## Próximos Passos (Para a IA)
-"Baseado na estrutura atual de `api/src/routes/images.js` e `frontend/src/pages/Images.jsx`, melhore a visualização da galeria permitindo a edição das legendas sem precisar re-enviar a imagem. Além disso, verifique a conexão com o banco de dados no ambiente Render."
+### 1. UX & Interface (Frontend)
+- **Notificações**: Instale `react-hot-toast` e substitua todos os `alert()` por toasts elegantes (sucesso, erro, carregando).
+- **Funcionalidade de Cópia**: Na [Galeria de Imagens](file:///c:/Users/Administrator/Documents/trae_projects/CL-TECH/cltech-core-saas/frontend/src/pages/Images.jsx), adicione um botão para copiar a URL direta da imagem da API para o clipboard.
+- **Skeleton Loaders**: Implemente componentes de "esqueleto" durante o `fetchImages` para evitar saltos de layout.
+- **Preview de Upload**: Melhore a área de upload com suporte a drag-and-drop e compressão de imagem no client-side (usando `browser-image-compression`).
+
+### 2. Segurança & Robustez (API)
+- **Validação de Dados**: Use `joi` para validar o corpo das requisições nos endpoints de upload e login, garantindo tipos de dados corretos e prevenindo injeções.
+- **Rate Limiting**: Implemente `express-rate-limit` para proteger os endpoints da API contra ataques de força bruta e abusos de upload.
+- **Edição de Legendas**: Adicione uma rota `PATCH /api/images/:id` para permitir que o usuário altere a legenda de uma imagem sem precisar reenviar o arquivo.
+
+### 3. Documentação & Integração (SaaS)
+- **Swagger/OpenAPI**: Configure o `swagger-ui-express` para gerar documentação interativa da API em `/api-docs`.
+- **Sincronização com Bot**: Crie um endpoint de Webhook (`/api/webhooks/bot-status`) para que o [Bot de WhatsApp](file:///c:/Users/Administrator/Documents/trae_projects/CL-TECH/cltech-core-saas/bot/src/index.js) possa reportar o sucesso/falha no envio de imagens.
+- **Fila de Envio**: Prepare a estrutura para usar `bull` com o Redis já configurado no [render.yaml](file:///c:/Users/Administrator/Documents/trae_projects/CL-TECH/cltech-core-saas/render.yaml) para processar envios em massa.
+
+## Diretrizes Técnicas
+1. **Padrão de Código**: Mantenha o estilo de importação `require` no backend e `ESM` no frontend.
+2. **Variáveis de Ambiente**: Nunca exponha chaves sensíveis; use sempre o arquivo `.env` e as definições do Render Blueprint.
+3. **Resiliência**: Trate erros de rede e de banco de dados com mensagens amigáveis ao usuário via toast.
+
+---
+*Este prompt serve como guia definitivo para a próxima fase de desenvolvimento do CL-TECH CORE.*
