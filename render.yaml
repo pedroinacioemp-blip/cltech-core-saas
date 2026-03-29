@@ -49,13 +49,15 @@ services:
     env: node
     plan: free
     region: ohio
-    buildCommand: cd bot && npm install && npx puppeteer browsers install chrome
+    buildCommand: cd bot && npm install
     startCommand: cd bot && node src/index.js
     envVars:
       - key: API_URL
         value: https://cltech-api-ch41.onrender.com
       - key: OPENAI_API_KEY
         sync: false
+      - key: PUPPETEER_CACHE_DIR
+        value: /opt/render/project/src/.cache/puppeteer
 
   # Redis Cache Service
   - type: redis

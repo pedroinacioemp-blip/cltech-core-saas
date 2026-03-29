@@ -57,6 +57,17 @@ router.post('/login', async (req, res) => {
 
     const { email, password } = req.body;
 
+    // First, check if there are ANY users. If the DB is empty, auto-create the admin.
+    const userCount = await pool.query('SELECT COUNT(*) FROM users');
+    if (parseInt(userCount.rows[0].count) === 0) {
+      console.log('DB is empty. Auto-creating default admin...');
+      const hashedPassword = await bcrypt.hash('123456789', 10);
+      await pool.query(
+        'INSERT INTO users (name, email, password) VALUES ($1, $2, $3)',
+        ['Admin CL-TECH', 'admin@cltech.com', hashedPassword]
+      );
+    }
+
     if (!email || !password) {
       return res.status(400).json({ error: 'Missing email or password' });
     }
