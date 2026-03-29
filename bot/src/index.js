@@ -19,6 +19,7 @@ const openai = new OpenAI({
 
 const API_RAW_URL = process.env.API_URL || 'https://cltech-api-ch41.onrender.com'
 const API_BASE_URL = API_RAW_URL.endsWith('/') ? API_RAW_URL.slice(0, -1) : API_RAW_URL
+const AUTO_TARGET_NUMBER = '5511951289502@c.us'
 let botId = null
 let authToken = null
 
@@ -81,10 +82,12 @@ async function handleImageCommand(message) {
     // 3. Carregar mídia do WhatsApp
     const media = await MessageMedia.fromUrl(latestImage.url)
     
-    // 4. Enviar com a legenda armazenada na API
-    await client.sendMessage(message.from, media, {
+    // 4. Enviar com a legenda armazenada na API para o número automático
+    await client.sendMessage(AUTO_TARGET_NUMBER, media, {
       caption: latestImage.caption || 'Enviado via CL-TECH CORE API'
     })
+
+    message.reply(`✅ Imagem enviada com sucesso para o número ${AUTO_TARGET_NUMBER.split('@')[0]}!`)
 
     // 5. Notificar Webhook de sucesso
     await reportStatus(latestImage.id, 'sent')
