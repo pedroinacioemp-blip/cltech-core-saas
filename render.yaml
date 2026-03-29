@@ -33,15 +33,13 @@ services:
     name: cltech-frontend
     env: static
     plan: free
-    region: ohio
+    # Static sites cannot have a region field in render.yaml
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
     envVars:
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: cltech-api
-          property: url
+        # We use the predictable Render URL since 'url' property is not supported directly in fromService
+        value: https://cltech-api.onrender.com
     routes:
       - type: rewrite
         source: /*
@@ -57,10 +55,7 @@ services:
     startCommand: cd bot && node src/index.js
     envVars:
       - key: API_URL
-        fromService:
-          type: web
-          name: cltech-api
-          property: url
+        value: https://cltech-api.onrender.com
       - key: OPENAI_API_KEY
         sync: false
 
