@@ -37,7 +37,7 @@ services:
     staticPublishPath: frontend/dist
     envVars:
       - key: VITE_API_URL
-        value: https://cltech-api.onrender.com
+        value: https://cltech-api-ch41.onrender.com
     routes:
       - type: rewrite
         source: /*
@@ -49,11 +49,11 @@ services:
     env: node
     plan: free
     region: ohio
-    buildCommand: cd bot && npm install
+    buildCommand: cd bot && npm install && npx puppeteer browsers install chrome
     startCommand: cd bot && node src/index.js
     envVars:
       - key: API_URL
-        value: https://cltech-api.onrender.com
+        value: https://cltech-api-ch41.onrender.com
       - key: OPENAI_API_KEY
         sync: false
 
