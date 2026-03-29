@@ -64,14 +64,14 @@ services:
       - key: OPENAI_API_KEY
         sync: false
 
+  # Redis Cache Service
+  - type: redis
+    name: cltech-redis
+    plan: free
+    region: ohio
+    ipAllowList: [] # Allow all internal connections
+
 databases:
   - name: cltech-db
     plan: free
     region: ohio
-
-# Redis Cache Service
-redis:
-  - name: cltech-redis
-    plan: free
-    region: ohio
-    ipAllowList: [] # Allow all internal connections
