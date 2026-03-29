@@ -28,29 +28,29 @@
 6. Clique "Create Database"
 7. **Copie a connectionString (você usará depois)**
 
-## Passo 3: Deploy Backend (.NET)
+## Passo 3: Deploy Backend (Node.js)
 
 1. Volte ao Dashboard Render
 2. Clique "New +" → "Web Service"
 3. Selecione seu repositório GitHub
 4. Configure:
    - **Name**: `cltech-api`
-   - **Environment**: Selecione `.NET`
-   - **Build Command**: `dotnet build`
-   - **Start Command**: `dotnet run --urls http://0.0.0.0:$PORT`
+   - **Environment**: Selecione `Node`
+   - **Build Command**: `cd api && npm install`
+   - **Start Command**: `cd api && node server.js`
    - **Branch**: main
-   - **Plan**: Free (ou pago conforme necessário)
+   - **Plan**: Free
 5. Clique "Environment" e defina:
    ```
-   ASPNETCORE_ENVIRONMENT=Production
-   ASPNETCORE_URLS=http://0.0.0.0:$PORT
-   ConnectionStrings__DefaultConnection=[Cole aqui a string do PostgreSQL]
-   Redis__ContainerName=redis-dominio.onrender.com:6379
-   Jwt__SecretKey=seu-secret-key-muuuito-longo-aqui
+   NODE_ENV=production
+   DATABASE_URL=[Cole aqui a string do PostgreSQL]
+   JWT_SECRET=seu-secret-key-muuuito-longo-aqui
+   CLOUDINARY_CLOUD_NAME=seu-cloud-name
+   CLOUDINARY_API_KEY=sua-api-key
+   CLOUDINARY_API_SECRET=sua-api-secret
    ```
 6. Clique "Create Web Service"
-7. **Aguarde 5-10 minutos o deploy completar**
-8. Copie a URL: `https://cltech-api.onrender.com`
+7. Copie a URL gerada (ex: `https://cltech-api.onrender.com`)
 
 ## Passo 4: Deploy Frontend (React)
 
@@ -70,34 +70,14 @@
 7. **Aguarde 3-5 minutos**
 8. Copie a URL: `https://cltech-frontend.onrender.com`
 
-## Passo 5: Deploy Redis (Cache)
+## Passo 5: Configurar Blueprint (Opcional - Rápido)
 
-1. Volte ao Dashboard Render
-2. Clique "New +" → "Redis"
-3. Nome: `cltech-redis`
-4. Region: Frankfurt
-5. Clique "Create"
-6. **Copie a connectionString Redis**
-
-## Passo 6: Atualizar Backend com Redis
-
-1. Volte ao serviço `cltech-api` no Render
-2. Clique em "Environment"
-3. Atualize: `Redis__ContainerName=sua-url-redis.onrender.com:XXXX`
-4. Clique "Save"
-5. Render fará redeploy automaticamente
-
-## Passo 7: Deploy Bot (Node.js - Opcional)
-
-1. Volte ao Dashboard
-2. Clique "New +" → "Web Service"
-3. Configure:
-   - **Name**: `cltech-bot`
-   - **Runtime**: Node
-   - **Build Command**: `cd bot && npm install`
-   - **Start Command**: `cd bot && node src/index.js`
-4. Defina environment:
-   ```
+Se você preferir automatizar tudo, o repositório já contém um arquivo `render.yaml`.
+1. No Dashboard Render, clique em "New +" → "Blueprint".
+2. Selecione seu repositório.
+3. A Render detectará automaticamente o banco de dados e os serviços.
+4. Preencha as variáveis do Cloudinary quando solicitado.
+5. Clique em "Apply".
    API_URL=https://cltech-api.onrender.com
    OPENAI_API_KEY=sua-chave-openai
    ```

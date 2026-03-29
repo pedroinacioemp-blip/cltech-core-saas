@@ -26,6 +26,13 @@ export default function Sidebar() {
         </Link>
         
         <Link
+          to="/images"
+          className="block px-4 py-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-neon-green transition"
+        >
+          🖼️ Galeria de Imagens
+        </Link>
+        
+        <Link
           to="/bots"
           className="block px-4 py-2 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-neon-green transition"
         >

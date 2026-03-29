@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
+import Images from './pages/Images'
 import './index.css'
 
 function ProtectedRoute({ children }) {
@@ -26,6 +27,15 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/images"
+          element={
+            <ProtectedRoute>
+              <Images />
             </ProtectedRoute>
           }
         />

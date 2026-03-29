@@ -8,8 +8,19 @@ CREATE TABLE IF NOT EXISTS users (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create index on email for faster lookups
-CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+-- Create images table
+CREATE TABLE IF NOT EXISTS images (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id),
+  url TEXT NOT NULL,
+  caption TEXT,
+  public_id TEXT, -- Cloudinary reference
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create index on user_id
+CREATE INDEX IF NOT EXISTS idx_images_user_id ON images(user_id);
 
 -- Insert sample user (password: 123456789)
 INSERT INTO users (name, email, password) VALUES (
