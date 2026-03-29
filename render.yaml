@@ -32,13 +32,11 @@ services:
   - type: web
     name: cltech-frontend
     env: static
-    plan: free
-    # Static sites cannot have a region field in render.yaml
+    # Plan is not allowed for static sites in Blueprints as they are always free
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
     envVars:
       - key: VITE_API_URL
-        # We use the predictable Render URL since 'url' property is not supported directly in fromService
         value: https://cltech-api.onrender.com
     routes:
       - type: rewrite
