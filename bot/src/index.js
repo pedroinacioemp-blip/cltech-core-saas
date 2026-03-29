@@ -17,7 +17,8 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 })
 
-const API_BASE_URL = process.env.API_URL || 'https://cltech-api-ch41.onrender.com'
+const API_RAW_URL = process.env.API_URL || 'https://cltech-api-ch41.onrender.com'
+const API_BASE_URL = API_RAW_URL.endsWith('/') ? API_RAW_URL.slice(0, -1) : API_RAW_URL
 let botId = null
 let authToken = null
 

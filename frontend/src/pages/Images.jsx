@@ -21,6 +21,19 @@ export default function ImageGallery() {
   const { accessToken } = useAuthStore();
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  
+  // Resilient URL construction: 
+  // 1. Remove trailing slash
+  // 2. Remove trailing /api (since we add it manually below)
+  const getCleanBaseUrl = (url) => {
+    let clean = url.endsWith('/') ? url.slice(0, -1) : url;
+    if (clean.endsWith('/api')) {
+      clean = clean.slice(0, -4);
+    }
+    return clean;
+  };
+
+  const BASE_URL = getCleanBaseUrl(API_URL);
 
   useEffect(() => {
     fetchImages();
@@ -35,7 +48,7 @@ export default function ImageGallery() {
 
   const fetchImages = async () => {
     try {
-      const res = await axios.get(`${API_URL}/api/images`, {
+      const res = await axios.get(`${BASE_URL}/api/images`, {
         headers: { Authorization: `Bearer ${accessToken}` }
       });
       setImages(res.data.images);
@@ -48,7 +61,7 @@ export default function ImageGallery() {
 
   const handleUpdateCaption = async (id) => {
     try {
-      await axios.patch(`${API_URL}/api/images/${id}`, { caption: editCaption }, {
+      await axios.patch(`${BASE_URL}/api/images/${id}`, { caption: editCaption }, {
         headers: { Authorization: `Bearer ${accessToken}` }
       });
       toast.success('Legenda atualizada!');
@@ -63,7 +76,7 @@ export default function ImageGallery() {
     if (!window.confirm('Deseja excluir esta imagem permanentemente?')) return;
     
     try {
-      await axios.delete(`${API_URL}/api/images/${id}`, {
+      await axios.delete(`${BASE_URL}/api/images/${id}`, {
         headers: { Authorization: `Bearer ${accessToken}` }
       });
       toast.success('Imagem excluída!');
@@ -104,7 +117,7 @@ export default function ImageGallery() {
       formData.append('image', compressedFile);
       formData.append('caption', caption);
 
-      await axios.post(`${API_URL}/api/images/upload`, formData, {
+      await axios.post(`${BASE_URL}/api/images/upload`, formData, {
         headers: { 
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'multipart/form-data'

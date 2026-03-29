@@ -50,6 +50,12 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Request Logger
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
 // Routes
 app.get('/health', (req, res) => {
   res.json({ 
@@ -76,6 +82,15 @@ const userRoutes = require('./src/routes/users');
 const imageRoutes = require('./src/routes/images');
 const webhookRoutes = require('./src/routes/webhooks');
 
+// Debug: Log registered routes
+console.log('Registered Routes:');
+console.log('- POST /api/auth/login');
+console.log('- POST /api/auth/register');
+console.log('- POST /api/images/upload');
+console.log('- GET /api/images');
+console.log('- PATCH /api/images/:id');
+console.log('- DELETE /api/images/:id');
+
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/images', imageRoutes);
@@ -92,7 +107,12 @@ app.use((err, req, res, next) => {
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found' });
+  console.log(`[404] Route not found: ${req.method} ${req.url}`);
+  res.status(404).json({ 
+    error: 'Route not found',
+    requestedPath: req.url,
+    requestedMethod: req.method
+  });
 });
 
 // Start server

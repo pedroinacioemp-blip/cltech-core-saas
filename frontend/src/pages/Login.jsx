@@ -10,16 +10,19 @@ export default function Login() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
-  const setAuth = useAuthStore(state => state.setAuth)
+  const { setAuth } = useAuthStore()
 
-  const handleLogin = async (e) => {
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+  const BASE_URL = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
     setError('')
 
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/login`,
+        `${BASE_URL}/api/auth/login`,
         { email, password }
       )
 

@@ -15,6 +15,9 @@ export default function Dashboard() {
   })
   const { accessToken, user } = useAuthStore()
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+  const BASE_URL = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL
+
   useEffect(() => {
     loadData()
   }, [])
@@ -26,7 +29,7 @@ export default function Dashboard() {
       }
 
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/v1/bots`,
+        `${BASE_URL}/api/v1/bots`,
         config
       )
 
