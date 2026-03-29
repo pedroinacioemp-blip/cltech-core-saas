@@ -1,4 +1,5 @@
-import Client from 'whatsapp-web.js'
+import pkg from 'whatsapp-web.js'
+const { Client, MessageMedia } = pkg
 import qrcode from 'qrcode-terminal'
 import axios from 'axios'
 import { OpenAI } from 'openai'
@@ -16,8 +17,9 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 })
 
-const API_BASE_URL = process.env.API_URL || 'http://localhost:5000'
+const API_BASE_URL = process.env.API_URL || 'https://cltech-api-ch41.onrender.com'
 let botId = null
+let authToken = null
 
 // ============================================================================
 // QR CODE GENERATION
@@ -41,41 +43,74 @@ client.on('message', async (message) => {
   console.log(`📨 Mensagem de ${message.from}: ${message.body}`)
 
   try {
-    // Extrair phone number
-    const phoneNumber = message.from.replace('@c.us', '')
+    // Comando para buscar imagem da API
+    if (message.body.toLowerCase().startsWith('!imagem')) {
+      await handleImageCommand(message)
+      return
+    }
 
-    // Salvar mensagem no backend
-    await saveMessage({
-      botId,
-      fromNumber: phoneNumber,
-      toNumber: 'bot',
-      content: message.body,
-      type: 'text',
-      direction: 'in'
-    })
-
-    // Processar com IA
+    // Processar com IA para outras mensagens
     const aiResponse = await processWithAI(message.body)
-
-    // Responder ao usuário
     await message.reply(aiResponse)
-
-    // Salvar resposta no backend
-    await saveMessage({
-      botId,
-      fromNumber: 'bot',
-      toNumber: phoneNumber,
-      content: aiResponse,
-      type: 'text',
-      direction: 'out',
-      isFromAI: true
-    })
 
   } catch (error) {
     console.error('❌ Erro:', error.message)
-    message.reply('😕 Desculpa, houve um erro. Tente novamente.')
+    message.reply('😕 Desculpa, houve um erro ao processar sua solicitação.')
   }
 })
+
+// ============================================================================
+// IMAGE COMMAND HANDLER
+// ============================================================================
+async function handleImageCommand(message) {
+  try {
+    // 1. Buscar imagens do usuário na API
+    const response = await axios.get(`${API_BASE_URL}/api/images`, {
+      headers: { Authorization: `Bearer ${authToken}` }
+    })
+
+    const images = response.data.images
+    if (!images || images.length === 0) {
+      return message.reply('Você ainda não tem imagens salvas na sua galeria CL-TECH.')
+    }
+
+    // 2. Pegar a última imagem (ou aleatória)
+    const latestImage = images[0]
+    
+    // 3. Carregar mídia do WhatsApp
+    const media = await MessageMedia.fromUrl(latestImage.url)
+    
+    // 4. Enviar com a legenda armazenada na API
+    await client.sendMessage(message.from, media, {
+      caption: latestImage.caption || 'Enviado via CL-TECH CORE API'
+    })
+
+    // 5. Notificar Webhook de sucesso
+    await reportStatus(latestImage.id, 'sent')
+
+  } catch (error) {
+    console.error('Image Command Error:', error.message)
+    message.reply('Erro ao buscar sua imagem na API.')
+    await reportStatus(null, 'failed', error.message)
+  }
+}
+
+// ============================================================================
+// REPORT STATUS TO API WEBHOOK
+// ============================================================================
+async function reportStatus(imageId, status, error = null) {
+  try {
+    await axios.post(`${API_BASE_URL}/api/webhooks/bot-status`, {
+      imageId,
+      status,
+      error
+    }, {
+      headers: { Authorization: `Bearer ${authToken}` }
+    })
+  } catch (err) {
+    console.error('Webhook Error:', err.message)
+  }
+}
 
 // ============================================================================
 // AI PROCESSING
@@ -87,7 +122,7 @@ async function processWithAI(message) {
       messages: [
         {
           role: 'system',
-          content: 'Você é um assistente amigável que responde mensagens no WhatsApp de forma breve e profissional.'
+          content: 'Você é um assistente da CL-TECH CORE. Responda de forma breve e profissional. Se o usuário quiser uma imagem, diga para ele usar o comando !imagem.'
         },
         {
           role: 'user',
@@ -106,41 +141,21 @@ async function processWithAI(message) {
 }
 
 // ============================================================================
-// SAVE MESSAGE TO BACKEND
-// ============================================================================
-async function saveMessage(data) {
-  try {
-    const token = process.env.BOT_TOKEN || ''
-    
-    await axios.post(`${API_BASE_URL}/api/v1/messages`, data, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    })
-  } catch (error) {
-    console.error('Error saving message:', error.message)
-  }
-}
-
-// ============================================================================
-// AUTHENTICATION & HEALTH CHECK
+// AUTHENTICATION
 // ============================================================================
 async function authenticate() {
   try {
-    const response = await axios.post(`${API_BASE_URL}/api/v1/auth/login`, {
-      email: process.env.BOT_EMAIL,
-      password: process.env.BOT_PASSWORD
+    const response = await axios.post(`${API_BASE_URL}/api/auth/login`, {
+      email: process.env.BOT_EMAIL || 'admin@cltech.com',
+      password: process.env.BOT_PASSWORD || '123456789'
     })
 
-    const { data } = response.data
-    process.env.AUTH_TOKEN = data.accessToken
-    botId = process.env.BOT_ID
-
-    console.log('✅ Bot autenticado com sucesso!')
+    const { accessToken } = response.data
+    authToken = accessToken
+    console.log('✅ Bot autenticado com sucesso na API Render!')
     return true
   } catch (error) {
-    console.error('❌ Erro de autenticação:', error.message)
+    console.error('❌ Erro de autenticação na API:', error.message)
     return false
   }
 }
@@ -149,11 +164,13 @@ async function authenticate() {
 // INITIALIZE
 // ============================================================================
 async function initialize() {
+  console.log(`🚀 Conectando à API: ${API_BASE_URL}`)
+  
   // Autenticar
   const isAuthenticated = await authenticate()
   if (!isAuthenticated) {
-    console.error('Falha na autenticação. Abortando...')
-    process.exit(1)
+    console.error('Falha na autenticação. Verifique BOT_EMAIL e BOT_PASSWORD.')
+    // Em produção, talvez queira tentar novamente em vez de sair
   }
 
   // Inicializar WhatsApp
@@ -165,7 +182,6 @@ async function initialize() {
 // ============================================================================
 client.on('disconnected', () => {
   console.log('❌ WhatsApp Bot desconectado!')
-  process.exit(1)
 })
 
 process.on('SIGINT', () => {
@@ -182,7 +198,6 @@ process.on('unhandledRejection', (reason, promise) => {
 // Start
 initialize().catch(err => {
   console.error('Initialization error:', err)
-  process.exit(1)
 })
 
 export { client, openai }
