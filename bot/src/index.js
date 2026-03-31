@@ -1,70 +1,96 @@
-import pkg from 'whatsapp-web.js'
-const { Client, MessageMedia } = pkg
-import qrcode from 'qrcode-terminal'
 import axios from 'axios'
 import { OpenAI } from 'openai'
 import dotenv from 'dotenv'
+import express from 'express'
 
 dotenv.config()
 
-const client = new Client({
-  puppeteer: {
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
-  }
-})
+const app = express()
+app.use(express.json())
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 })
 
-const API_RAW_URL = process.env.API_URL || 'https://cltech-api-ch41.onrender.com'
-const API_BASE_URL = API_RAW_URL.endsWith('/') ? API_RAW_URL.slice(0, -1) : API_RAW_URL
-const AUTO_TARGET_NUMBER = '5511951289502@c.us'
-let botId = null
+// Configurações da WhatsApp Cloud API (Meta)
+const WA_PHONE_NUMBER_ID = process.env.WA_PHONE_NUMBER_ID
+const WA_ACCESS_TOKEN = process.env.WA_ACCESS_TOKEN
+const API_BASE_URL = process.env.API_URL || 'https://cltech-api-ch41.onrender.com'
+const AUTO_TARGET_NUMBER = '5511951289502' // Número configurado
+
 let authToken = null
 
 // ============================================================================
-// QR CODE GENERATION
+// ENVIAR MENSAGEM VIA CLOUD API (Sem QR Code)
 // ============================================================================
-client.on('qr', (qr) => {
-  console.log('\n📱 Scan QR Code for WhatsApp:')
-  qrcode.generate(qr, { small: true })
-})
-
-// ============================================================================
-// CLIENT READY
-// ============================================================================
-client.on('ready', () => {
-  console.log('✅ WhatsApp Bot is ready!')
-})
-
-// ============================================================================
-// MESSAGE HANDLER
-// ============================================================================
-client.on('message', async (message) => {
-  console.log(`📨 Mensagem de ${message.from}: ${message.body}`)
-
+async function sendWhatsAppMessage(to, content, isImage = false, caption = '') {
   try {
-    // Comando para buscar imagem da API
-    if (message.body.toLowerCase().startsWith('!imagem')) {
-      await handleImageCommand(message)
-      return
+    const url = `https://graph.facebook.com/v18.0/${WA_PHONE_NUMBER_ID}/messages`
+    
+    let data;
+    if (isImage) {
+      data = {
+        messaging_product: "whatsapp",
+        recipient_type: "individual",
+        to: to,
+        type: "image",
+        image: {
+          link: content,
+          caption: caption
+        }
+      }
+    } else {
+      data = {
+        messaging_product: "whatsapp",
+        recipient_type: "individual",
+        to: to,
+        type: "text",
+        text: { body: content }
+      }
     }
 
-    // Processar com IA para outras mensagens
-    const aiResponse = await processWithAI(message.body)
-    await message.reply(aiResponse)
+    const response = await axios.post(url, data, {
+      headers: {
+        'Authorization': `Bearer ${WA_ACCESS_TOKEN}`,
+        'Content-Type': 'application/json'
+      }
+    })
 
+    console.log(`✅ Mensagem enviada via API para ${to}`)
+    return response.data
   } catch (error) {
-    console.error('❌ Erro:', error.message)
-    message.reply('😕 Desculpa, houve um erro ao processar sua solicitação.')
+    console.error('❌ Erro no envio via Cloud API:', error.response?.data || error.message)
+    throw error
+  }
+}
+
+// ============================================================================
+// WEBHOOK PARA RECEBER MENSAGENS (Opcional)
+// ============================================================================
+app.get('/webhook', (req, res) => {
+  const mode = req.query['hub.mode']
+  const token = req.query['hub.verify_token']
+  const challenge = req.query['hub.challenge']
+
+  if (mode && token === process.env.WA_VERIFY_TOKEN) {
+    res.status(200).send(challenge)
+  } else {
+    res.sendStatus(403)
   }
 })
 
+app.post('/webhook', async (req, res) => {
+  const body = req.body
+  console.log('📨 Nova mensagem recebida via Webhook Meta')
+  
+  // Lógica para processar mensagens recebidas pode ser adicionada aqui
+  res.sendStatus(200)
+})
+
 // ============================================================================
-// IMAGE COMMAND HANDLER
+// LÓGICA DE AUTOMAÇÃO DE IMAGEM
 // ============================================================================
-async function handleImageCommand(message) {
+async function handleImageAutomation() {
   try {
     // 1. Buscar imagens do usuário na API
     const response = await axios.get(`${API_BASE_URL}/api/images`, {
@@ -73,79 +99,43 @@ async function handleImageCommand(message) {
 
     const images = response.data.images
     if (!images || images.length === 0) {
-      return message.reply('Você ainda não tem imagens salvas na sua galeria CL-TECH.')
+      console.log('Nenhuma imagem para enviar.')
+      return
     }
 
-    // 2. Pegar a última imagem (ou aleatória)
     const latestImage = images[0]
     
-    // 3. Carregar mídia do WhatsApp
-    const media = await MessageMedia.fromUrl(latestImage.url)
-    
-    // 4. Enviar com a legenda armazenada na API para o número automático
-    await client.sendMessage(AUTO_TARGET_NUMBER, media, {
-      caption: latestImage.caption || 'Enviado via CL-TECH CORE API'
-    })
+    // 2. Enviar via Cloud API para o número fixo
+    await sendWhatsAppMessage(
+      AUTO_TARGET_NUMBER, 
+      latestImage.url, 
+      true, 
+      latestImage.caption || 'Enviado via CL-TECH API'
+    )
 
-    message.reply(`✅ Imagem enviada com sucesso para o número ${AUTO_TARGET_NUMBER.split('@')[0]}!`)
-
-    // 5. Notificar Webhook de sucesso
+    // 3. Reportar status
     await reportStatus(latestImage.id, 'sent')
 
   } catch (error) {
-    console.error('Image Command Error:', error.message)
-    message.reply('Erro ao buscar sua imagem na API.')
+    console.error('Erro na automação de imagem:', error.message)
     await reportStatus(null, 'failed', error.message)
   }
 }
 
-// ============================================================================
-// REPORT STATUS TO API WEBHOOK
-// ============================================================================
 async function reportStatus(imageId, status, error = null) {
   try {
     await axios.post(`${API_BASE_URL}/api/webhooks/bot-status`, {
-      imageId,
-      status,
-      error
+      imageId, status, error
     }, {
       headers: { Authorization: `Bearer ${authToken}` }
     })
   } catch (err) {
-    console.error('Webhook Error:', err.message)
+    console.error('Erro ao reportar status:', err.message)
   }
 }
 
 // ============================================================================
-// AI PROCESSING
-// ============================================================================
-async function processWithAI(message) {
-  try {
-    const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
-      messages: [
-        {
-          role: 'system',
-          content: 'Você é um assistente da CL-TECH CORE. Responda de forma breve e profissional. Se o usuário quiser uma imagem, diga para ele usar o comando !imagem.'
-        },
-        {
-          role: 'user',
-          content: message
-        }
-      ],
-      max_tokens: 150,
-      temperature: 0.7
-    })
-
-    return response.choices[0].message.content
-  } catch (error) {
-    console.error('AI Error:', error.message)
-    return 'Desculpa, não consegui processar sua mensagem. Tente novamente!'
-  }
-}
-
-// ============================================================================
-// AUTHENTICATION
+// INITIALIZE
 // ============================================================================
 async function authenticate() {
   try {
@@ -153,10 +143,8 @@ async function authenticate() {
       email: process.env.BOT_EMAIL || 'admin@cltech.com',
       password: process.env.BOT_PASSWORD || '123456789'
     })
-
-    const { accessToken } = response.data
-    authToken = accessToken
-    console.log('✅ Bot autenticado com sucesso na API Render!')
+    authToken = response.data.token
+    console.log('✅ Bot autenticado na API!')
     return true
   } catch (error) {
     console.error('❌ Erro de autenticação na API:', error.message)
@@ -164,44 +152,18 @@ async function authenticate() {
   }
 }
 
-// ============================================================================
-// INITIALIZE
-// ============================================================================
 async function initialize() {
-  console.log(`🚀 Conectando à API: ${API_BASE_URL}`)
-  
-  // Autenticar
-  const isAuthenticated = await authenticate()
-  if (!isAuthenticated) {
-    console.error('Falha na autenticação. Verifique BOT_EMAIL e BOT_PASSWORD.')
-    // Em produção, talvez queira tentar novamente em vez de sair
-  }
+  const isAuth = await authenticate()
+  if (isAuth) {
+    console.log('🚀 Bot iniciado em modo API (Sem QR Code)')
+    
+    // Iniciar servidor de Webhook
+    const PORT = process.env.PORT || 3000
+    app.listen(PORT, () => console.log(`📡 Webhook server listening on port ${PORT}`))
 
-  // Inicializar WhatsApp
-  client.initialize()
+    // Exemplo: Rodar automação a cada 5 minutos
+    setInterval(handleImageAutomation, 5 * 60 * 1000)
+  }
 }
 
-// ============================================================================
-// ERROR HANDLING
-// ============================================================================
-client.on('disconnected', () => {
-  console.log('❌ WhatsApp Bot desconectado!')
-})
-
-process.on('SIGINT', () => {
-  console.log('\n🛑 Encerrando bot...')
-  client.destroy().then(() => {
-    process.exit(0)
-  })
-})
-
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection:', reason)
-})
-
-// Start
-initialize().catch(err => {
-  console.error('Initialization error:', err)
-})
-
-export { client, openai }
+initialize()

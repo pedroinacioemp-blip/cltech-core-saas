@@ -43,7 +43,7 @@ services:
         source: /*
         destination: /index.html
 
-  # Node.js Bot (WhatsApp Automation)
+  # Node.js Bot (WhatsApp Automation - Oficial API)
   - type: web
     name: cltech-bot
     env: node
@@ -56,8 +56,12 @@ services:
         value: https://cltech-api-ch41.onrender.com
       - key: OPENAI_API_KEY
         sync: false
-      - key: PUPPETEER_CACHE_DIR
-        value: /opt/render/project/src/.cache/puppeteer
+      - key: WA_PHONE_NUMBER_ID
+        sync: false # Pegue no Painel da Meta (Ex: 123456789)
+      - key: WA_ACCESS_TOKEN
+        sync: false # Pegue no Painel da Meta (Token Permanente)
+      - key: WA_VERIFY_TOKEN
+        sync: false # Defina um token para o Webhook
 
   # Redis Cache Service
   - type: redis
