@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ClTechCore.Api/ClTechCore.Api.csproj" />
+    <Project Path="src/ClTechCore.Application/ClTechCore.Application.csproj" />
+    <Project Path="src/ClTechCore.Domain/ClTechCore.Domain.csproj" />
+    <Project Path="src/ClTechCore.Infrastructure/ClTechCore.Infrastructure.csproj" />
+  </Folder>
+</Solution>

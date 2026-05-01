@@ -1,0 +1,15 @@
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Application\obj\Debug\net10.0\ClTechCore.Application.csproj.AssemblyReference.cache
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Application\obj\Debug\net10.0\ClTechCore.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Application\obj\Debug\net10.0\ClTechCore.Application.AssemblyInfoInputs.cache
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Application\obj\Debug\net10.0\ClTechCore.Application.AssemblyInfo.cs
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Application\obj\Debug\net10.0\ClTechCore.Application.csproj.CoreCompileInputs.cache
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Application\bin\Debug\net10.0\ClTechCore.Application.deps.json
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Application\bin\Debug\net10.0\ClTechCore.Application.dll
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Application\bin\Debug\net10.0\ClTechCore.Application.pdb
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Application\bin\Debug\net10.0\ClTechCore.Domain.dll
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Application\bin\Debug\net10.0\ClTechCore.Domain.pdb
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Application\obj\Debug\net10.0\ClTechCo.A7255181.Up2Date
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Application\obj\Debug\net10.0\ClTechCore.Application.dll
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Application\obj\Debug\net10.0\refint\ClTechCore.Application.dll
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Application\obj\Debug\net10.0\ClTechCore.Application.pdb
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Application\obj\Debug\net10.0\ref\ClTechCore.Application.dll

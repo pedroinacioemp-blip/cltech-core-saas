@@ -1,0 +1,65 @@
+{
+  "name": "cl-tech-core",
+  "version": "1.0.2",
+  "description": "CL TECH CORE - Hacker IDE para C++ e Java",
+  "main": "main.js",
+  "author": "CL TECH",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build-win": "electron-builder --win",
+    "dev": "electron ."
+  },
+  "dependencies": {
+    "electron-squirrel-startup": "1.0.0"
+  },
+  "devDependencies": {
+    "electron": "26.2.1",
+    "electron-builder": "24.6.0"
+  },
+  "build": {
+    "appId": "com.cltech.core",
+    "productName": "CL TECH CORE",
+    "artifactName": "CL TECH CORE Setup ${version}.${ext}",
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "msi",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "CL TECH CORE"
+    },
+    "msi": {
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "CL TECH CORE"
+    }
+  }
+}

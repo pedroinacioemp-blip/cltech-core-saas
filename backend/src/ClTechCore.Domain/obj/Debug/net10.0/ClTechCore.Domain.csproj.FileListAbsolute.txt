@@ -1,0 +1,11 @@
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Domain\bin\Debug\net10.0\ClTechCore.Domain.deps.json
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Domain\bin\Debug\net10.0\ClTechCore.Domain.dll
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Domain\bin\Debug\net10.0\ClTechCore.Domain.pdb
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Domain\obj\Debug\net10.0\ClTechCore.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Domain\obj\Debug\net10.0\ClTechCore.Domain.AssemblyInfoInputs.cache
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Domain\obj\Debug\net10.0\ClTechCore.Domain.AssemblyInfo.cs
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Domain\obj\Debug\net10.0\ClTechCore.Domain.csproj.CoreCompileInputs.cache
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Domain\obj\Debug\net10.0\ClTechCore.Domain.dll
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Domain\obj\Debug\net10.0\refint\ClTechCore.Domain.dll
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Domain\obj\Debug\net10.0\ClTechCore.Domain.pdb
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Domain\obj\Debug\net10.0\ref\ClTechCore.Domain.dll
