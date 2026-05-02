@@ -90,3 +90,4 @@ C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Api\obj\Debug
 C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Api\obj\Debug\net10.0\ClTechCore.Api.pdb
 C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Api\obj\Debug\net10.0\ClTechCore.Api.genruntimeconfig.cache
 C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Api\obj\Debug\net10.0\ref\ClTechCore.Api.dll
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Api\obj\Debug\net10.0\ClTechCore.Api.sourcelink.json

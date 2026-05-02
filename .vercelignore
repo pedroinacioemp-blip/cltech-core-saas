@@ -1,0 +1,15 @@
+# Excluir arquivos e pastas desnecessárias para deploy
+node_modules/
+dist/
+assets/
+renderer/
+mobile/
+package-lock.json
+README.md
+README_FINAL.md
+*.md
+*.bat
+*.slnx
+.env
+.env.example
+backend/data/

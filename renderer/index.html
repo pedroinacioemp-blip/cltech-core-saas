@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CL TECH CORE</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Canvas para efeito Matrix -->
+  <canvas id="matrixCanvas"></canvas>
+
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <h1 class="title">
+          <span class="bracket">[</span>
+          <span class="cl">CL</span>
+          <span class="space"> </span>
+          <span class="tech">TECH</span>
+          <span class="space"> </span>
+          <span class="core">CORE</span>
+          <span class="bracket">]</span>
+        </h1>
+        <p class="subtitle">Hacker IDE for C++ & Java Compilation</p>
+      </div>
+      <div class="header-status">
+        <span id="status-indicator" class="status-dot"></span>
+        <span id="status-text">Ready</span>
+      </div>
+    </header>
+
+    <!-- Controls Panel -->
+    <div class="controls">
+      <button id="runBtn" class="btn btn-run" title="Compilar e Executar (Ctrl+Enter)"><span class="btn-icon">▶</span> RUN</button>
+      <button id="compileBtn" class="btn btn-compile" title="Apenas Compilar (Ctrl+Shift+C)"><span class="btn-icon">⚙</span> COMPILE</button>
+      <button id="clearBtn" class="btn btn-clear" title="Limpar Console (Ctrl+L)"><span class="btn-icon">🧹</span> CLEAR</button>
+      <button id="openFileBtn" class="btn btn-open" title="Abrir Arquivo (Ctrl+O)"><span class="btn-icon">📂</span> OPEN FILE</button>
+      <input type="file" id="fileInput" accept=".cpp,.java" hidden>
+    </div>
+
+    <!-- Toolbar for Advanced Features -->
+    <div class="toolbar">
+      <div class="theme-selector">
+        <label for="themeSelect">🎨 Tema:</label>
+        <select id="themeSelect" class="theme-dropdown">
+          <option value="dark-green">Dark Green</option>
+          <option value="dark-blue">Dark Blue</option>
+          <option value="dark-purple">Dark Purple</option>
+        </select>
+      </div>
+      <button id="themeBtn" class="toolbar-btn" title="Temas"><span>🎨</span> Temas</button>
+      <button id="syntaxBtn" class="toolbar-btn" title="Highlight de Sintaxe"><span>💡</span> Syntax</button>
+      <button id="minimapBtn" class="toolbar-btn" title="Minimapa"><span>🗺️</span> Minimapa</button>
+      <button id="snippetsBtn" class="toolbar-btn" title="Snippets"><span>📄</span> Snippets</button>
+      <button id="historyBtn" class="toolbar-btn" title="Histórico de Execução"><span>🕑</span> Histórico</button>
+      <button id="exportBtn" class="toolbar-btn" title="Exportar Projeto"><span>📦</span> Exportar</button>
+      <button id="gitBtn" class="toolbar-btn" title="Git"><span>🔀</span> Git</button>
+      <button id="terminalBtn" class="toolbar-btn" title="Terminal Avançado"><span>🖥️</span> Terminal</button>
+      <button id="copilotBtn" class="toolbar-btn" title="Copilot Chat"><span>🤖</span> Copilot</button>
+      <button id="collabBtn" class="toolbar-btn" title="Colaboração"><span>👥</span> Colab</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Editor -->
+      <section class="editor-section">
+        <div class="section-header">
+          <h2>📝 CODE EDITOR</h2>
+          <span id="language-badge" class="language-badge">Waiting...</span>
+          <span id="file-name" class="file-name">No file loaded</span>
+        </div>
+        <div id="monacoEditor" class="editor" style="height: 400px;"></div>
+        <textarea 
+          id="codeEditor" 
+          class="editor" 
+          placeholder="// Digite seu código C++ ou Java aqui
+// Ou abra um arquivo existente"
+          spellcheck="false"
+          style="display:none;"
+        ></textarea>
+      </section>
+
+      <!-- Console -->
+      <section class="console-section">
+        <div class="section-header">
+          <h2>🔧 CONSOLE OUTPUT</h2>
+          <button id="consoleAction" class="btn-mini btn-mini-copy">📋 Copy</button>
+        </div>
+        <div id="console" class="console">
+          <div class="console-line">
+            <span class="console-prompt">></span>
+            <span class="console-text">CL TECH CORE iniciado...</span>
+          </div>
+          <div class="console-line">
+            <span class="console-prompt">></span>
+            <span class="console-text">Aguardando compilação</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Google Search -->
+      <section class="search-section">
+        <div class="section-header">
+          <h2>🔍 GOOGLE CODE SEARCH</h2>
+          <button id="searchBtn" class="btn-mini btn-mini-search">🔍 Search</button>
+        </div>
+        <div class="search-controls">
+          <input type="text" id="searchQuery" placeholder="Buscar código ou soluções..." class="search-input">
+          <input type="text" id="apiKey" placeholder="Google API Key" class="search-input api-input">
+          <input type="text" id="cx" placeholder="Custom Search Engine ID" class="search-input cx-input">
+        </div>
+        <div id="searchResults" class="search-results">
+          <div class="search-placeholder">Digite uma consulta e clique em Search para buscar soluções no Google</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <span class="footer-text">
+        <span class="version">v1.0.0</span> • 
+        <span id="compiler-status">Verificando compiladores...</span>
+      </span>
+    </footer>
+  </div>
+
+  <script src="matrix.js"></script>
+  <script src="monaco-loader.js"></script>
+  <script src="api.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

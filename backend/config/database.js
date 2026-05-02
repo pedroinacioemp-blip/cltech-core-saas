@@ -4,9 +4,13 @@
 
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const os = require('os');
 const fs = require('fs');
 
-const dbPath = process.env.DB_PATH || path.join(__dirname, '../data/cltech.db');
+const isVercel = !!process.env.VERCEL;
+const dbPath = process.env.DB_PATH || (isVercel
+  ? path.join(os.tmpdir(), 'cltech.db')
+  : path.join(__dirname, '../data/cltech.db'));
 const dataDir = path.dirname(dbPath);
 
 // Criar diretório data se não existir

@@ -15,3 +15,4 @@ C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Infrastructur
 C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Infrastructure\obj\Debug\net10.0\refint\ClTechCore.Infrastructure.dll
 C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Infrastructure\obj\Debug\net10.0\ClTechCore.Infrastructure.pdb
 C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Infrastructure\obj\Debug\net10.0\ref\ClTechCore.Infrastructure.dll
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Infrastructure\obj\Debug\net10.0\ClTechCore.Infrastructure.sourcelink.json

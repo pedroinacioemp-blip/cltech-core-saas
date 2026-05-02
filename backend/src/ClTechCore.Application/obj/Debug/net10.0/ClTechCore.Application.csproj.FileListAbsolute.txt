@@ -13,3 +13,4 @@ C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Application\o
 C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Application\obj\Debug\net10.0\refint\ClTechCore.Application.dll
 C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Application\obj\Debug\net10.0\ClTechCore.Application.pdb
 C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Application\obj\Debug\net10.0\ref\ClTechCore.Application.dll
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Application\obj\Debug\net10.0\ClTechCore.Application.sourcelink.json

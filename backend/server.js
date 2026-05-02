@@ -80,8 +80,9 @@ app.use(errorHandler);
 // INICIAR SERVIDOR
 // ==========================================
 
-app.listen(PORT, () => {
-  console.log(`
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`
 ╔════════════════════════════════════════╗
 ║   CL TECH CORE - Backend API Server    ║
 ║   🚀 Rodando na porta ${PORT}
@@ -91,14 +92,15 @@ app.listen(PORT, () => {
 ║                                        ║
 ║   Saúde: GET /api/health              ║
 ╚════════════════════════════════════════╝
-  `);
+    `);
 
-  // Graceful shutdown
-  process.on('SIGINT', () => {
-    console.log('\n\n✓ Encerrando servidor...');
-    db.close();
-    process.exit(0);
+    // Graceful shutdown
+    process.on('SIGINT', () => {
+      console.log('\n\n✓ Encerrando servidor...');
+      db.close();
+      process.exit(0);
+    });
   });
-});
+}
 
 module.exports = app;

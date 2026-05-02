@@ -9,3 +9,4 @@ C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Domain\obj\De
 C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Domain\obj\Debug\net10.0\refint\ClTechCore.Domain.dll
 C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Domain\obj\Debug\net10.0\ClTechCore.Domain.pdb
 C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Domain\obj\Debug\net10.0\ref\ClTechCore.Domain.dll
+C:\Users\Administrator\Desktop\CL-TECH-CORE\backend\src\ClTechCore.Domain\obj\Debug\net10.0\ClTechCore.Domain.sourcelink.json

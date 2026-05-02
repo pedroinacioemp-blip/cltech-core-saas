@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ClTechCore.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d44d330d27ae4428e929852533140992d7d1c31b")]
 [assembly: System.Reflection.AssemblyProductAttribute("ClTechCore.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ClTechCore.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
