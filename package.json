@@ -21,6 +21,10 @@
     "electron": "^30.0.0",
     "electron-builder": "^25.1.0"
   },
+  "engines": {
+    "node": ">=24.0.0",
+    "npm": ">=10.0.0"
+  },
   "build": {
     "appId": "com.cltech.core",
     "productName": "CL TECH CORE",
