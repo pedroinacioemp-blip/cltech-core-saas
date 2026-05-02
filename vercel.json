@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "outputDirectory": "public",
   "env": {
     "VERCEL": "true",
     "NODE_ENV": "production",
@@ -7,7 +8,7 @@
   },
   "routes": [
     {
-      "src": "/(.*)",
+      "src": "/api/(.*)",
       "dest": "/api/index.js"
     }
   ]
