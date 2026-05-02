@@ -86,6 +86,11 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Rota favicon
+app.get('/favicon.ico', (req, res) => {
+  res.status(204).end();
+});
+
 // Rota raiz para debug
 app.get('/', (req, res) => {
   res.json({
