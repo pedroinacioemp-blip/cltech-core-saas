@@ -17,8 +17,8 @@
     "electron-squirrel-startup": "1.0.0"
   },
   "devDependencies": {
-    "electron": "26.2.1",
-    "electron-builder": "24.6.0"
+    "electron": "^30.0.0",
+    "electron-builder": "^25.1.0"
   },
   "build": {
     "appId": "com.cltech.core",
