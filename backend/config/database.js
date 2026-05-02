@@ -2,10 +2,17 @@
 // DATABASE CONFIGURATION & INITIALIZATION
 // ==========================================
 
-const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
+
+let sqlite3;
+try {
+  sqlite3 = require('sqlite3').verbose();
+} catch (err) {
+  console.error('✗ SQLite3 module not found. Install backend dependencies.');
+  process.exit(1);
+}
 
 const isVercel = !!process.env.VERCEL;
 const dbPath = process.env.DB_PATH || (isVercel
@@ -28,6 +35,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
 });
 
 // Habilitar foreign keys
+
 db.serialize(() => {
   db.run('PRAGMA foreign_keys = ON');
 });
