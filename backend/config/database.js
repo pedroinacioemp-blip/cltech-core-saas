@@ -38,33 +38,46 @@ if (!useInMemory) {
   }
 }
 
-try {
-  db = new (sqlite3 || require('better-sqlite3'))(dbPath, (err) => {
-    if (err) {
-      console.warn('⚠ Database connection warning:', err.message);
-    } else {
-      console.log(`✓ Conectado ao banco de dados: ${dbPath}`);
-    }
-  });
-} catch (e) {
-  console.warn('⚠ SQLite3 initialization failed, using stub database:', e.message);
-  // Criar stub db para não quebrar a aplicação
+if (!useInMemory) {
+  try {
+    db = new sqlite3.Database(dbPath, (err) => {
+      if (err) {
+        console.warn('⚠ Database connection warning:', err.message);
+      } else {
+        console.log(`✓ Conectado ao banco de dados: ${dbPath}`);
+      }
+    });
+  } catch (e) {
+    console.warn('⚠ SQLite3 initialization failed, using stub database:', e.message);
+    useInMemory = true;
+  }
+}
+
+if (useInMemory || !db) {
   db = {
     serialize: (fn) => fn(),
     run: (sql, params, cb) => {
+      if (typeof params === 'function') {
+        cb = params;
+      }
       if (typeof cb === 'function') cb(null);
     },
     get: (sql, params, cb) => {
+      if (typeof params === 'function') {
+        cb = params;
+      }
       if (typeof cb === 'function') cb(null, null);
     },
     all: (sql, params, cb) => {
+      if (typeof params === 'function') {
+        cb = params;
+      }
       if (typeof cb === 'function') cb(null, []);
     },
     close: (cb) => {
       if (typeof cb === 'function') cb(null);
     }
   };
-  useInMemory = true;
 }
 
 // Habilitar foreign keys (segura contra erro)
