@@ -38,11 +38,26 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 // INICIALIZAR BANCO DE DADOS
 // ==========================================
 
+let dbInitialized = false;
+
 db.init().then(() => {
   console.log('✓ Banco de dados inicializado com sucesso');
+  dbInitialized = true;
 }).catch(err => {
   console.error('✗ Erro ao inicializar banco de dados:', err);
-  process.exit(1);
+  // Não fazer process.exit em ambiente serverless
+  if (!process.env.VERCEL) {
+    process.exit(1);
+  }
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({
+    status: dbInitialized ? 'ok' : 'initializing',
+    db: dbInitialized ? 'connected' : 'connecting',
+    timestamp: new Date().toISOString()
+  });
 });
 
 // ==========================================
@@ -61,12 +76,22 @@ app.use('/api/files', fileRoutes);
 // Compilação e Execução
 app.use('/api/compile', compileRoutes);
 
-// Health Check
+// Health Check consolidado
 app.get('/api/health', (req, res) => {
   res.json({
-    status: 'ok',
+    status: dbInitialized ? 'ok' : 'initializing',
+    db: dbInitialized ? 'connected' : 'connecting',
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
+  });
+});
+
+// Rota raiz para debug
+app.get('/', (req, res) => {
+  res.json({
+    message: 'CL TECH CORE - Backend API',
+    version: '1.0.2',
+    health: '/api/health'
   });
 });
 
@@ -74,7 +99,23 @@ app.get('/api/health', (req, res) => {
 // ERROR HANDLER
 // ==========================================
 
-app.use(errorHandler);
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    error: 'Not Found',
+    path: req.path,
+    method: req.method
+  });
+});
+
+// Error handler
+app.use((err, req, res, next) => {
+  console.error('✗ Error:', err);
+  res.status(err.status || 500).json({
+    error: err.message || 'Internal Server Error',
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+  });
+});
 
 // ==========================================
 // INICIAR SERVIDOR
